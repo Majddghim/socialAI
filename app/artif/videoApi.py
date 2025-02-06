@@ -1,7 +1,7 @@
 import requests
 
 API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-video-diffusion-txt2vid"
-headers = {"Authorization": "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"}
+headers = {"Authorization": ""}
 
 def generate_video(prompt):
     payload = {"inputs": prompt}

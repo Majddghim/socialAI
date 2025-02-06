@@ -5,7 +5,7 @@ import os
 
 class AssemblyAI:
     def __init__(self):
-        aai.settings.api_key = "288efa0c78ad48b5818d8077f91e2ee3"
+        aai.settings.api_key = ""
 
     def transcribe(self, audio_file):
         if not os.path.exists(audio_file):

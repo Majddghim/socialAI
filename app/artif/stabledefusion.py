@@ -1,7 +1,7 @@
 import requests
 
 # image generation with hugging face stable-diffusion-2 model
-HF_TOKEN = "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"
+HF_TOKEN = ""
 API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2"
 
 headers = {"Authorization": f"Bearer {HF_TOKEN}"}

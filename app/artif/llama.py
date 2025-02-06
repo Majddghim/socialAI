@@ -1,12 +1,12 @@
 import requests
 
 # Your Hugging Face API Token
-HF_TOKEN = "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"
+HF_TOKEN = ""
 
 # LLaMA model endpoint (choose a free one like Meta's LLaMA 2 7B)
 API_URL = "https://api-inference.huggingface.co/models/tiiuae/falcon-7b-instruct"
 
-headers = {"Authorization": f"Bearer {HF_TOKEN}"}
+headers = {"Authorization": f""}
 
 
 def generate_text(prompt):
