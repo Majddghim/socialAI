@@ -1,22 +1,49 @@
+import time
 import requests
 
-# image generation with hugging face stable-diffusion-2 model
-HF_TOKEN = ""
+HF_TOKEN = "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"
 API_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2"
-
 headers = {"Authorization": f"Bearer {HF_TOKEN}"}
 
-def generate_image(prompt):
+
+def generate_image(description):
+    prompt = f"Create an image based on the following description: {description}. The image should reflect the elements described clearly, with proper composition and details."
     payload = {"inputs": prompt}
-    response = requests.post(API_URL, headers=headers, json=payload)
-    return response.content  # Returns the image bytes
+
+    # Retry logic
+    retries = 5
+    for _ in range(retries):
+        try:
+            response = requests.post(API_URL, headers=headers, json=payload)
+
+            if response.status_code == 200:
+                return response.content
+            elif response.status_code == 503:
+                # Handle the model loading case
+                error_info = response.json()
+                estimated_time = error_info.get('estimated_time', 0)
+                print(f"Model is still loading. Retrying in {estimated_time:.2f} seconds...")
+                time.sleep(estimated_time)  # Wait for the model to load
+            else:
+                print(f"Error: {response.status_code}")
+                print(response.json())
+                return None
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return None
+
+    print("Image generation failed after retries.")
+    return None
+
 
 # Example Usage
-#prompt = "a dog in a field of flowers"
-#image_data = generate_image(prompt)
+#llama_description = "A fluffy dog on a meadow."
+#image_data = generate_image(llama_description)
 
-# Save Image
-#with open("generated_image.png", "wb") as file:
- #   file.write(image_data)
-
-#print("Image saved as generated_image.png")
+#if image_data:
+    # Save Image
+    #with open("generated_image.png", "wb") as file:
+        #file.write(image_data)
+    #print("Image saved as generated_image.png")
+#else:
+    #print("Image generation failed.")

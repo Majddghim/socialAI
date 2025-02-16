@@ -1,12 +1,12 @@
 import requests
 
 # Your Hugging Face API Token
-HF_TOKEN = ""
+HF_TOKEN = "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"
 
 # LLaMA model endpoint (choose a free one like Meta's LLaMA 2 7B)
 API_URL = "https://api-inference.huggingface.co/models/tiiuae/falcon-7b-instruct"
 
-headers = {"Authorization": f""}
+headers = {"Authorization": f"Bearer {HF_TOKEN}"}
 
 
 def generate_text(prompt):
@@ -20,7 +20,7 @@ def extract(description, nbr):
     Generate a number of posts based on the given video description.
     """
     #prompt = f"From this text '{description}', generate {nbr} short social media posts based on it. Format the response as a numbered list."
-    prompt = f"generate only 1 short reduced recap of 100 caracters from this text :  '{description}'"
+    prompt = f"from this '{description}' generate {nbr} short social media posts based related to tech and dont write anything else except the post desicription i need to post"
 
     payload = {"inputs": prompt}
     response = requests.post(API_URL, headers=headers, json=payload)

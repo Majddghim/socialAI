@@ -5,7 +5,7 @@ import os
 
 class AssemblyAI:
     def __init__(self):
-        aai.settings.api_key = ""
+        aai.settings.api_key = "288efa0c78ad48b5818d8077f91e2ee3"
 
     def transcribe(self, audio_file):
         if not os.path.exists(audio_file):
@@ -38,7 +38,7 @@ class AssemblyAI:
         else:
             raise FileNotFoundError("Downloaded audio file not found.")
 
-
+"""
 if __name__ == "__main__":
     youtube_url = "https://www.youtube.com/watch?v=mBFf-aYoV6Q"
 
@@ -53,3 +53,4 @@ if __name__ == "__main__":
 
     # Step 3: Print the result
     print("Transcript:", transcript)
+"""

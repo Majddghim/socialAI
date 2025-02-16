@@ -14,7 +14,10 @@
     <section>
         <div class="container py-4 py-xl-5">
             <section class="py-5 mt-5">
-                <h1 class="text-center mb-4">UpComing Posts</h1>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="text-center mb-0">UpComing Posts</h1>
+                    <button class="btn btn-primary" type="button" id="generate-post-btn">Generate Post</button>
+                </div>
                 <section class="py-5">
                     <div class="container">
                         <div class="row filtr-container">
@@ -23,10 +26,10 @@
                                 <div class="card border-dark">
                                     <img class="img-fluid card-img-top w-100 d-block rounded-0" src="{{ post[1] }}">
                                     <div class="card-body">
-                                        <p class="card-text">{{ post[0] }}</p> <!-- Displays the link here -->
+                                        <p class="card-text">{{ post[0] }}</p>
                                     </div>
                                     <div class="d-flex card-footer">
-                                        <button class="btn btn-dark btn-sm" type="button">post now</button>
+                                        <button class="btn btn-dark btn-sm post-now-btn" type="button" data-description="{{ post[0] }}" data-image="{{ post[1] }}">Post Now</button>
                                     </div>
                                 </div>
                             </div>
@@ -38,9 +41,141 @@
             </section>
         </div>
     </section>
+
+    <div class="modal fade" id="mediaTypeModal" tabindex="-1" aria-labelledby="mediaTypeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mediaTypeModalLabel">Select Post Type</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>What type of post do you want to generate?</p>
+                    <button class="btn btn-primary" id="generate-photo">Photo</button>
+                    <button class="btn btn-secondary" id="generate-video">Video</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="socialMediaModal" tabindex="-1" aria-labelledby="socialMediaModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="socialMediaModalLabel">Select a Platform</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Where would you like to post?</p>
+                    <button class="btn btn-primary social-btn" data-platform="instagram">Instagram</button>
+                    <button class="btn btn-primary social-btn" data-platform="facebook">Facebook</button>
+                    <button class="btn btn-primary social-btn" data-platform="x">X</button>
+                    <button class="btn btn-danger social-btn" data-platform="all">ALL</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <footer></footer>
+
     <script src="{{ url_for('static', filename='assets/bootstrap/js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='assets/js/startup-modern.js') }}"></script>
+
+    <script>
+        document.getElementById("generate-post-btn").addEventListener("click", function() {
+            var mediaTypeModal = new bootstrap.Modal(document.getElementById('mediaTypeModal'));
+            mediaTypeModal.show();
+        });
+
+        document.getElementById("generate-photo").addEventListener("click", function() {
+            fetch('/features_request', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({}),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === "Post added successfully") {
+                    window.location.reload();
+                    const newPost = `
+                        <div class="col-md-6 col-lg-4 filtr-item" data-category="2,3">
+                            <div class="card border-dark">
+                                <img class="img-fluid card-img-top w-100 d-block rounded-0" src="${data.image_url}">
+                                <div class="card-body">
+                                    <p class="card-text">${data.description}</p>
+                                </div>
+                                <div class="d-flex card-footer">
+                                    <button class="btn btn-dark btn-sm post-now-btn" type="button" data-description="${data.description}" data-image="${data.image_url}">Post Now</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    document.querySelector('.filtr-container').innerHTML += newPost;
+                } else {
+                    alert("Failed to generate post");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("An error occurred while generating the post");
+            });
+        });
+
+        document.getElementById("generate-video").addEventListener("click", function() {
+            fetch('/generate_video_post', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({}),
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message || "Video post generated successfully");
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("An error occurred while generating the video post");
+            });
+        });
+
+        document.addEventListener("click", function(event) {
+            if (event.target.classList.contains("post-now-btn")) {
+                const description = event.target.getAttribute("data-description");
+                const image = event.target.getAttribute("data-image");
+
+                document.querySelectorAll(".social-btn").forEach(button => {
+                    button.onclick = function() {
+                        const platform = this.getAttribute("data-platform");
+                        fetch('/post_to_social_media', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                description: description,
+                                image: image,
+                                platform: platform
+                            }),
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            alert(data.message || "Post submitted successfully");
+                        })
+                        .catch(error => {
+                            console.error("Error:", error);
+                            alert("An error occurred while posting");
+                        });
+                    };
+                });
+
+                var myModal = new bootstrap.Modal(document.getElementById('socialMediaModal'));
+                myModal.show();
+            }
+        });
+    </script>
 </body>
 
 </html>
